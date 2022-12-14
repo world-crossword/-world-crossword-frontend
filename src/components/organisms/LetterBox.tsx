@@ -72,7 +72,8 @@ const StyledLetterBox = styled.div`
   height: 50px;
   min-width: 50px;
   min-height: 50px;
-  border: solid 1px #aaa;
+  border: solid 0.5px #aaa;
+  outline: solid 0.5px #aaa;
   cursor: pointer;
   font-size: 22px;
   font-weight: 600;

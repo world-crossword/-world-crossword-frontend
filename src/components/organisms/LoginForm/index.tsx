@@ -1,3 +1,4 @@
+import Image from 'next/future/image';
 import { StyledLoginForm } from './styled';
 
 const LoginForm: React.FC = () => {
@@ -10,7 +11,9 @@ const LoginForm: React.FC = () => {
           <button type={'submit'}>ENTER</button>
         </div>
         <div className={'socialLogin'}>
-          <div className={'googleLogo'}>img</div>
+          <div className={'googleLogo'}>
+            <Image></Image>
+          </div>
           <p>Login with Google</p>
         </div>
       </StyledLoginForm>
