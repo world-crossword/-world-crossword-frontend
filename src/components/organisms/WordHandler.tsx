@@ -7,6 +7,8 @@ import {
 import { WordHandlerData, zIndex } from 'others/GlobalStyle';
 import { ChangeEvent, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import back from 'public/back.png';
+import Image from 'next/image';
 
 interface Props {
   closeWordHandler: () => void;
@@ -14,7 +16,7 @@ interface Props {
 }
 
 const WordHandler: React.FC<Props> = ({ closeWordHandler, wordHandlerData }) => {
-  const [wordState, setWordState] = useState(DEFAULT_WORD_STATE);
+  const [wordState, setWordState] = useState(MY_CORRECT_WORD_STATE);
   const [word, setWord] = useState('');
 
   const goToMain = () => closeWordHandler();
@@ -29,6 +31,11 @@ const WordHandler: React.FC<Props> = ({ closeWordHandler, wordHandlerData }) => 
 
   return (
     <StyledWordHandler state={wordState}>
+      <div className="goBackWrapper">
+        <div className="goBack" onClick={closeWordHandler}>
+          <Image alt={'go back'} src={back} />
+        </div>
+      </div>
       <form>
         <input
           type={'text'}
@@ -41,13 +48,15 @@ const WordHandler: React.FC<Props> = ({ closeWordHandler, wordHandlerData }) => 
           <p>noun</p>
         </div>
         <p>the act of saying the word hello to someone as a greeting</p>
-        {wordState === WRONG_WORD_STATE || wordState === DEFAULT_WORD_STATE ? (
-          <button type={'submit'}>SUBMIT</button>
-        ) : (
-          <button type={'button'} onClick={goToMain}>
-            GO BACK
-          </button>
-        )}
+        <div className="submit">
+          {wordState === WRONG_WORD_STATE || wordState === DEFAULT_WORD_STATE ? (
+            <button type={'submit'}>SUBMIT</button>
+          ) : (
+            <button type={'button'} onClick={goToMain}>
+              GO BACK
+            </button>
+          )}
+        </div>
       </form>
     </StyledWordHandler>
   );
@@ -60,14 +69,33 @@ interface WordHandlerProps {
 const StyledWordHandler = styled.div<WordHandlerProps>`
   display: flex;
   position: fixed;
-  top: 0;
-  left: 0;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  padding: 10px;
   background: #fff;
   z-index: ${zIndex.wordHandler};
+
+  .goBackWrapper {
+    width: 100%;
+    max-width: 800px;
+    .goBack {
+      top: 0;
+      left: 0;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      > img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+
   > form {
     display: flex;
     flex-direction: column;
@@ -76,6 +104,8 @@ const StyledWordHandler = styled.div<WordHandlerProps>`
     padding: 20px;
     width: 100%;
     border: solid 1px #ccc;
+    border-radius: 4px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     background: ${({ state }) => {
       switch (state) {
         case DEFAULT_WORD_STATE:
@@ -97,6 +127,7 @@ const StyledWordHandler = styled.div<WordHandlerProps>`
       text-align: center;
       letter-spacing: 5px;
       margin-bottom: 10px;
+      border-radius: 4px;
     }
     > div {
       display: flex;
@@ -111,11 +142,23 @@ const StyledWordHandler = styled.div<WordHandlerProps>`
       font-size: 20px;
       margin-bottom: 20px;
     }
-    > button {
-      background: #fff;
-      height: 40px;
-      outline: none;
-      border: none;
+    .submit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      button {
+        background: #fff;
+        width: 120px;
+        height: 40px;
+        outline: none;
+        border: none;
+        background: #04673a;
+        color: #fff;
+        font-size: 16px;
+        letter-spacing: 3px;
+        border-radius: 4px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+      }
     }
   }
 `;

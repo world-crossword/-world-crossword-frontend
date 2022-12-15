@@ -76,6 +76,14 @@ const Board: React.FC<Props> = ({ openWordHandler, openAcrossDownChooser }) => {
       str: 'a',
       isSolved: false,
     },
+    {
+      startRow: 0,
+      startCol: 0,
+      isRow: true,
+      length: 1,
+      str: 'a',
+      isSolved: false,
+    },
   ];
 
   const processArray = () => {

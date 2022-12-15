@@ -1,6 +1,9 @@
+import Image from 'next/image';
 import { AcrossDownChooserData, WordHandlerData, zIndex } from 'others/GlobalStyle';
 import { MouseEvent } from 'react';
 import styled from 'styled-components';
+import across from 'public/across.svg';
+import down from 'public/down.svg';
 
 interface Props {
   closeAcrossDownChooser: () => void;
@@ -33,8 +36,14 @@ const AcrossDownChooser: React.FC<Props> = ({ closeAcrossDownChooser, openWordHa
   return (
     <StyledAcrossDownChooser onClick={closeAcrossDownChooser}>
       <div>
-        <div onClick={(e) => handleChoosing(e, ACROSS)}>Across</div>
-        <div onClick={(e) => handleChoosing(e, DOWN)}>Down</div>
+        <div onClick={(e) => handleChoosing(e, ACROSS)}>
+          <Image alt={'across'} src={across} />
+          <p>Across</p>
+        </div>
+        <div onClick={(e) => handleChoosing(e, DOWN)}>
+          <Image alt={'down'} src={down} />
+          <p>Down</p>
+        </div>
       </div>
     </StyledAcrossDownChooser>
   );
@@ -58,13 +67,26 @@ const StyledAcrossDownChooser = styled.div`
     max-width: 350px;
     width: 100%;
     height: 200px;
-    background: #fff;
+    border-radius: 4px;
     > div {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: space-around;
       width: 100%;
       height: 100%;
+      border-radius: 4px;
+      box-shadow: 0 0 0 1px #ddd;
+      background: #fff;
+      > img {
+        width: 80%;
+        height: 70%;
+      }
+    }
+    > div:hover {
+      background: #118952;
+      box-shadow: 0 0 0 1px #118952;
+      color: #fff;
     }
   }
 `;

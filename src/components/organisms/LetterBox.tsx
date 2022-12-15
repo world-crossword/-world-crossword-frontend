@@ -48,9 +48,13 @@ const LetterBox: React.FC<Props> = ({ data, openWordHandler, openAcrossDownChoos
     case BLANK_STATE:
       return <Blank></Blank>;
     case PRIVATE_STATE:
-      return <StyledLetterBox onClick={letterBoxClickHandler}></StyledLetterBox>;
+      return <StyledLetterBox state={PRIVATE_STATE} onClick={letterBoxClickHandler}></StyledLetterBox>;
     case PUBLIC_STATE:
-      return <StyledLetterBox onClick={letterBoxClickHandler}>{data.alp}</StyledLetterBox>;
+      return (
+        <StyledLetterBox state={PUBLIC_STATE} onClick={letterBoxClickHandler}>
+          {data.alp}
+        </StyledLetterBox>
+      );
     default:
       return <></>;
   }
@@ -64,7 +68,11 @@ const Blank = styled.div`
   pointer-events: none;
 `;
 
-const StyledLetterBox = styled.div`
+interface StyledLetterBoxProps {
+  state: number;
+}
+
+const StyledLetterBox = styled.div<StyledLetterBoxProps>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,8 +80,21 @@ const StyledLetterBox = styled.div`
   height: 50px;
   min-width: 50px;
   min-height: 50px;
-  border: solid 0.5px #aaa;
-  outline: solid 0.5px #aaa;
+  border-radius: 6px;
+  ${({ state }) => {
+    if (state === PRIVATE_STATE) {
+      return `
+      border: solid 1px #aaa;
+      box-shadow: 0 0 0 1px #aaa;
+      `;
+    } else {
+      return `
+      background: #04673a10;
+      border: solid 1px #04673a;
+      box-shadow: 0 0 0 1px #04673a;
+      `;
+    }
+  }}
   cursor: pointer;
   font-size: 22px;
   font-weight: 600;

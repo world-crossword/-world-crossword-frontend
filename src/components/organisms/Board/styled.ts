@@ -7,5 +7,6 @@ export const StyledBoard = styled.div`
   height: 100%;
   > div {
     display: flex;
+    justify-content: center;
   }
 `;
