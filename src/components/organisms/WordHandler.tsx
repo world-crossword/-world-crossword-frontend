@@ -16,7 +16,7 @@ interface Props {
 }
 
 const WordHandler: React.FC<Props> = ({ closeWordHandler, wordHandlerData }) => {
-  const [wordState, setWordState] = useState(MY_CORRECT_WORD_STATE);
+  const [wordState, setWordState] = useState(DEFAULT_WORD_STATE);
   const [word, setWord] = useState('');
 
   const goToMain = () => closeWordHandler();

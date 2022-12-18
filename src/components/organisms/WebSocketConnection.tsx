@@ -10,14 +10,11 @@ const WebSocketConnection = () => {
     if (!ws.current) {
       ws.current = new WebSocket(BROKER_URL);
       ws.current.onopen = () => {
-        console.log('hi');
         setSocketConnected(true);
       };
     }
 
-    return () => {
-      //   ws.current.close();
-    };
+    return () => {};
   }, []);
 
   useEffect(() => {
@@ -30,7 +27,7 @@ const WebSocketConnection = () => {
         })
       );
 
-      ws.current.onmessage = (event) => {
+      ws.current.onmessage = (event: any) => {
         console.log(event.data);
       };
     }
