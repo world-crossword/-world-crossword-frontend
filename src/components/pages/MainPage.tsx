@@ -4,20 +4,18 @@ import Status from 'components/organisms/Status';
 import WordHandler from 'components/organisms/WordHandler';
 import Image from 'next/image';
 import { AcrossDownChooserData, PageDefaultLayout, WordHandlerData } from 'others/GlobalStyle';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import exit from 'public/exit.svg';
 import logo from 'public/mainLogo.png';
 import { useRouter } from 'next/router';
 import { useRecoilValue } from 'recoil';
-import { accessTokenAtom } from 'others/store';
 
 const MainPage: React.FC = () => {
   const [handleWordHandler, setHandleWordHandler] = useState(false);
   const [wordHandlerData, setWordHandlerData] = useState<WordHandlerData>();
   const [handleAcrossDownChooser, setHandleAcrossDownChooser] = useState(false);
   const [acrossDownChooserData, setAcrossDownChooserData] = useState<AcrossDownChooserData>();
-  const accessToken = useRecoilValue(accessTokenAtom);
   const router = useRouter();
 
   const openWordHandler = ({ startRow, startCol, isRow }: WordHandlerData) => {
@@ -40,9 +38,13 @@ const MainPage: React.FC = () => {
     router.push('/login');
   };
 
+  useEffect(() => {
+    console.log('메인페이지 입장');
+  }, []);
+
   return (
     <MainPageLayout>
-      {accessToken !== '0' && (
+      {
         <>
           <div className="logo">
             <Image alt={'mainLogo'} src={logo} fill />
@@ -65,7 +67,7 @@ const MainPage: React.FC = () => {
             ></AcrossDownChooser>
           )}
         </>
-      )}
+      }
     </MainPageLayout>
   );
 };

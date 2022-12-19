@@ -10,8 +10,13 @@ const WebSocketConnection = () => {
     if (!ws.current) {
       ws.current = new WebSocket(BROKER_URL);
       ws.current.onopen = () => {
+        console.log('hi');
         setSocketConnected(true);
       };
+
+      //   ws.current.onclose = (e) => {
+      //     console.log(e);
+      //   };
     }
 
     return () => {};
