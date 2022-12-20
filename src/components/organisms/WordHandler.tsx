@@ -11,6 +11,8 @@ import back from 'public/back.png';
 import Image from 'next/image';
 import myAxios from 'others/myAxios';
 import { useRouter } from 'next/router';
+import { useRecoilValue } from 'recoil';
+import { myIdAtom } from 'others/store';
 
 interface Props {
   closeWordHandler: () => void;
@@ -18,6 +20,7 @@ interface Props {
 }
 
 const WordHandler: React.FC<Props> = ({ closeWordHandler, wordHandlerData }) => {
+  const myId = useRecoilValue(myIdAtom);
   const [wordData, setWordData] = useState<{
     word: string;
     part: string;
@@ -39,7 +42,7 @@ const WordHandler: React.FC<Props> = ({ closeWordHandler, wordHandlerData }) => 
 
   const handleHandlerState = (completion: number, solver_id: number) => {
     if (completion === 0) setHandlerState(DEFAULT_WORD_STATE);
-    else setHandlerState(solver_id !== 1 ? ANY_CORRECT_WORD_STATE : MY_CORRECT_WORD_STATE);
+    else setHandlerState(solver_id !== myId ? ANY_CORRECT_WORD_STATE : MY_CORRECT_WORD_STATE);
   };
 
   const getWordData = async () => {

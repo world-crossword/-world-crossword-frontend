@@ -1,19 +1,20 @@
 import { useRouter } from 'next/router';
 import myAxios from 'others/myAxios';
-import { loginAtom, readyAtom } from 'others/store';
+import { loginAtom, myIdAtom, readyAtom } from 'others/store';
 import { useEffect } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import useInterval from 'use-interval';
 
 const Checker: React.FC = () => {
   const router = useRouter();
   const [isLogin, setIsLogin] = useRecoilState(loginAtom);
   const [isReady, setIsReady] = useRecoilState(readyAtom);
+  const setMyId = useSetRecoilState(myIdAtom);
 
   const checkLogin = async () => {
     try {
-      await myAxios('get', 'member/me', null, true);
-      // console.log(res);
+      const res = await myAxios('get', 'member/me', null, true);
+      setMyId(res.data.memberId);
       setIsLogin(true);
     } catch (e) {
       // console.log(e);

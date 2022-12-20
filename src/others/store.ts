@@ -11,6 +11,11 @@ export const readyAtom = atom({
   default: false,
 });
 
+export const myIdAtom = atom({
+  key: 'id',
+  default: null,
+});
+
 export const connectionAtom = atom({
   key: 'connection',
   default: false,
