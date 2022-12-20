@@ -52,18 +52,18 @@ const MainPage: React.FC = () => {
       pathname: '/',
       query: { id: id + ad },
     });
-    const res = await myAxios('get', `puzzle/${id}/${id + ad}`);
+    const res = await myAxios('get', `puzzle/${id}/${id + ad}`, null, true);
     setPuzzleData(res.data.puzzle);
   };
 
-  const getPuzzleData = async (id: number) => {
-    const res = await myAxios('get', `puzzle/0/${id}`);
+  const getPuzzleData = async (id: string) => {
+    const res = await myAxios('get', `puzzle/0/${id}`, null, true);
     setPuzzleData(res.data.puzzle);
   };
 
   useEffect(() => {
     if (!router.isReady) return;
-    getPuzzleData(router.query.id);
+    getPuzzleData(router.query.id as string);
   }, [isConnection, router.isReady]);
 
   useEffect(() => {
@@ -84,9 +84,9 @@ const MainPage: React.FC = () => {
           <div className="logo">
             <Image alt={'mainLogo'} src={logo} fill />
           </div>
-          <div className={'exit'} onClick={goToLogin}>
+          {/* <div className={'exit'} onClick={goToLogin}>
             <Image alt={'exit'} src={exit} width={20} />
-          </div>
+          </div> */}
           <Status></Status>
           <div className="boardWrapper">
             <Board

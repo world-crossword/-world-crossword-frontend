@@ -10,7 +10,16 @@ import { rankingListAtom } from 'others/store';
 
 const Status: React.FC = () => {
   const [isExpand, setIsExpand] = useState(true);
-  const [rankingList, setRankingList] = useRecoilState(rankingListAtom);
+  const [rankingList, setRankingList] = useRecoilState<{
+    ranking: [];
+    mine: {
+      rank: string;
+      ranker: {
+        username: string;
+      };
+      score: number;
+    };
+  }>(rankingListAtom);
 
   const handleStatusSize = () => {
     setIsExpand(!isExpand);
@@ -21,7 +30,7 @@ const Status: React.FC = () => {
   };
 
   const getRanking = async () => {
-    const res = await myAxios('get', `ranking`);
+    const res = await myAxios('get', `ranking`, null, true);
     setRankingList(res.data);
   };
 
@@ -36,15 +45,27 @@ const Status: React.FC = () => {
         <p>Ranking</p>
       </div>
       <div className={'ranking'}>
-        {rankingList?.ranking.map(({ rank, ranker, score }) => {
-          return (
-            <div key={ranker?.username}>
-              <span className={'rank'}>{rank}</span>
-              <span className={'nickname'}>{ranker?.username}</span>
-              <span className={'score'}>{score}</span>
-            </div>
-          );
-        })}
+        {rankingList?.ranking.map(
+          ({
+            rank,
+            ranker,
+            score,
+          }: {
+            rank: string;
+            ranker: {
+              username: string;
+            };
+            score: number;
+          }) => {
+            return (
+              <div key={ranker?.username}>
+                <span className={'rank'}>{rank}</span>
+                <span className={'nickname'}>{ranker?.username}</span>
+                <span className={'score'}>{score}</span>
+              </div>
+            );
+          }
+        )}
         <div className={'myRanking'}>
           <span className={'rank'}>{rankingList?.mine?.rank}</span>
           <span className={'nickname'}>{rankingList?.mine?.ranker?.username}</span>

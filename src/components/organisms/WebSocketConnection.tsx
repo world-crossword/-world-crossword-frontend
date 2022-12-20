@@ -31,13 +31,13 @@ const WebSocketConnection = () => {
 
   useEffect(() => {
     if (socketConnected) {
-      ws.current.send(
-        JSON.stringify({
-          task: 'auth',
-          googleId: 'test@gmail.com',
-          sessionName: '1',
-        })
-      );
+      //   ws.current.send(
+      //     JSON.stringify({
+      //       task: 'auth',
+      //       googleId: 'test@gmail.com',
+      //       sessionName: '1',
+      //     })
+      //   );
 
       ws.current.onmessage = (event: any) => {
         const puzzle = JSON.parse(event.data).puzzle;

@@ -12,32 +12,32 @@ const Checker: React.FC = () => {
 
   const checkLogin = async () => {
     try {
-      const res = await myAxios('post', 'api/v1/auth/account-token', null, true);
-      console.log(res);
+      await myAxios('post', 'api/v1/auth/account-token', null, true);
+      // console.log(res);
       setIsLogin(true);
     } catch (e) {
-      console.log(e);
+      // console.log(e);
     } finally {
       setIsReady(true);
     }
   };
 
   useEffect(() => {
-    // checkLogin();
+    checkLogin();
   }, []);
 
   useInterval(() => {
     // checkLogin();
   }, REFRESH_ACCESS_TOKEN_TIME);
 
-  // useEffect(() => {
-  //   if (!isReady) return;
-  //   if (!isLogin) {
-  //     if (router.pathname !== '/login') router.push('/login');
-  //   } else {
-  //     if (router.pathname === '/login') router.push('/');
-  //   }
-  // }, [isReady, router.pathname]);
+  useEffect(() => {
+    if (!isReady) return;
+    if (!isLogin) {
+      router.push('/login');
+    } else {
+      if (router.pathname === '/login') router.push('/');
+    }
+  }, [isReady, router.pathname]);
 
   return <></>;
 };

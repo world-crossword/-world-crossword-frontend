@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { BLANK_STATE, PRIVATE_STATE, PUBLIC_STATE } from 'others/GlobalConsts';
 import { AcrossDownChooserData, WordHandlerData } from 'others/GlobalStyle';
 import myAxios from 'others/myAxios';
-import { connectionAtom, solvedWordAtom } from 'others/store';
+import { connectionAtom, SolvedWord, solvedWordAtom } from 'others/store';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import LetterBox from '../LetterBox';
@@ -25,7 +25,7 @@ interface Props {
 }
 
 const Board: React.FC<Props> = ({ openWordHandler, openAcrossDownChooser, puzzleData }) => {
-  const [NNArray, setNNArray] = useState<{ row: Atom; col: Atom }[][]>([]);
+  const [NNArray, setNNArray] = useState<{ row: Atom; col: Atom; start?: boolean }[][]>([]);
   const solvedWord = useRecoilValue(solvedWordAtom);
 
   const processArray = () => {
@@ -79,7 +79,7 @@ const Board: React.FC<Props> = ({ openWordHandler, openAcrossDownChooser, puzzle
 
   const processedAlp = (rowAlp: string, colAlp: string) => rowAlp ?? colAlp;
 
-  const processedData = (row: Atom, col: Atom, start) => ({
+  const processedData = (row: Atom, col: Atom, start?: boolean) => ({
     state: processedState(row.state, col.state),
     row: row.state !== BLANK_STATE ? { startRow: row.startRow, startCol: row.startCol, id: row.id } : undefined,
     col: col.state !== BLANK_STATE ? { startRow: col.startRow, startCol: col.startCol, id: col.id } : undefined,
@@ -87,7 +87,7 @@ const Board: React.FC<Props> = ({ openWordHandler, openAcrossDownChooser, puzzle
     start: start ?? false,
   });
 
-  const updateArray = ({ row_point: startCol, col_point: startRow, direction, word }) => {
+  const updateArray = ({ row_point: startCol, col_point: startRow, direction, word }: SolvedWord) => {
     const isRow = direction === ACROSS ? true : false;
     const newNNArray = JSON.parse(JSON.stringify(NNArray));
     const length = word?.length;
@@ -103,7 +103,6 @@ const Board: React.FC<Props> = ({ openWordHandler, openAcrossDownChooser, puzzle
         posCol.state = PUBLIC_STATE;
       }
     }
-    // console.log(newNNArray);
     setNNArray(newNNArray);
   };
 
@@ -113,7 +112,6 @@ const Board: React.FC<Props> = ({ openWordHandler, openAcrossDownChooser, puzzle
   }, [puzzleData]);
 
   useEffect(() => {
-    console.log(solvedWord);
     updateArray(solvedWord);
   }, [solvedWord]);
 

@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import back from 'public/back.png';
 import Image from 'next/image';
 import myAxios from 'others/myAxios';
+import { useRouter } from 'next/router';
 
 interface Props {
   closeWordHandler: () => void;
@@ -17,9 +18,18 @@ interface Props {
 }
 
 const WordHandler: React.FC<Props> = ({ closeWordHandler, wordHandlerData }) => {
-  const [wordData, setWordData] = useState({});
+  const [wordData, setWordData] = useState<{
+    word: string;
+    part: string;
+    mean: string;
+  }>({
+    word: '',
+    part: '',
+    mean: '',
+  });
   const [inputWord, setInputWord] = useState('');
   const [handlerState, setHandlerState] = useState(DEFAULT_WORD_STATE);
+  const router = useRouter();
 
   const goToMain = () => closeWordHandler();
 
@@ -27,25 +37,30 @@ const WordHandler: React.FC<Props> = ({ closeWordHandler, wordHandlerData }) => 
     setInputWord(e.target.value);
   };
 
-  const handleHandlerState = (completion, solver_id) => {
+  const handleHandlerState = (completion: number, solver_id: number) => {
     if (completion === 0) setHandlerState(DEFAULT_WORD_STATE);
     else setHandlerState(solver_id !== 1 ? ANY_CORRECT_WORD_STATE : MY_CORRECT_WORD_STATE);
   };
 
   const getWordData = async () => {
-    const res = await myAxios('get', `puzzle/mean/${wordHandlerData.id}`);
+    const res = await myAxios('get', `puzzle/mean/${wordHandlerData.id}`, null, true);
     console.log(res.data.word);
     setWordData(res.data);
     handleHandlerState(res.data.completion, res.data.solver_id);
   };
 
-  const submitWord = async (e) => {
+  const submitWord = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await myAxios('post', `puzzle`, {
-      id: wordHandlerData.id,
-      word: inputWord,
-      session_name: '1',
-    });
+    const res = await myAxios(
+      'post',
+      `puzzle`,
+      {
+        id: wordHandlerData.id,
+        word: inputWord,
+        session_name: router.query.id,
+      },
+      true
+    );
     setHandlerState(res.data.solved === RIGHT ? MY_CORRECT_WORD_STATE : WRONG_WORD_STATE);
   };
 
