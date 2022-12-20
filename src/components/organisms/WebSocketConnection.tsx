@@ -25,8 +25,6 @@ const WebSocketConnection = () => {
       //     console.log(e);
       //   };
     }
-
-    return () => {};
   }, [isLogin]);
 
   useEffect(() => {
