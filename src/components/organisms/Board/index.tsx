@@ -94,7 +94,7 @@ const Board: React.FC<Props> = ({ openWordHandler, openAcrossDownChooser, puzzle
     if (isRow) {
       for (let i = startRow; i < startRow + length; i++) {
         const posRow = newNNArray[startCol][i].row;
-        console.log(posRow);
+        // console.log(posRow);
         posRow.state = PUBLIC_STATE;
       }
     } else {

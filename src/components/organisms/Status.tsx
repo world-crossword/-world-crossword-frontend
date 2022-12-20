@@ -5,8 +5,8 @@ import left from 'public/left.svg';
 import right from 'public/right.svg';
 import { useEffect, useState } from 'react';
 import myAxios from 'others/myAxios';
-import { useRecoilState } from 'recoil';
-import { rankingListAtom } from 'others/store';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { rankingListAtom, readyAtom } from 'others/store';
 
 const Status: React.FC = () => {
   const [isExpand, setIsExpand] = useState(true);
@@ -20,6 +20,7 @@ const Status: React.FC = () => {
       score: number;
     };
   }>(rankingListAtom);
+  const isReady = useRecoilValue(readyAtom);
 
   const handleStatusSize = () => {
     setIsExpand(!isExpand);
@@ -35,8 +36,9 @@ const Status: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!isReady) return;
     getRanking();
-  }, []);
+  }, [isReady]);
 
   return (
     <StyledStatus isExpand={isExpand}>

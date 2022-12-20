@@ -63,8 +63,10 @@ const MainPage: React.FC = () => {
 
   useEffect(() => {
     if (!router.isReady) return;
+    if (!isConnection) return;
+    if (!isReady) return;
     getPuzzleData(router.query.id as string);
-  }, [isConnection, router.isReady]);
+  }, [isReady, isConnection, router.isReady]);
 
   useEffect(() => {
     if (!router.isReady) return;
