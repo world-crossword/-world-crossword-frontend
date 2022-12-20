@@ -48,16 +48,38 @@ const MainPage: React.FC = () => {
 
   const movePuzzle = async (ad: number) => {
     const id = Number(router.query.id);
-    router.push({
-      pathname: '/',
-      query: { id: id + ad },
-    });
-    const res = await myAxios('get', `puzzle/${id}/${id + ad}`, null, true);
-    setPuzzleData(res.data.puzzle);
+    let processedId;
+    if (id + ad <= 0 || id + ad >= 11) {
+      router.push({
+        pathname: '/',
+        query: { id: 1 },
+      });
+      processedId = 1;
+    } else {
+      processedId = id + ad;
+      router.push({
+        pathname: '/',
+        query: { id: id + ad },
+      });
+    }
+
+    try {
+      const res = await myAxios('get', `puzzle/${id}/${processedId}`, null, true);
+      setPuzzleData(res.data.puzzle);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
-  const getPuzzleData = async (id: string) => {
-    const res = await myAxios('get', `puzzle/0/${id}`, null, true);
+  const getPuzzleData = async (id: number) => {
+    if (id <= 0 || id >= 11) {
+      router.push({
+        pathname: '/',
+        query: { id: 1 },
+      });
+    }
+    const processedId = id <= 0 || id >= 11 ? 1 : id;
+    const res = await myAxios('get', `puzzle/0/${processedId}`, null, true);
     setPuzzleData(res.data.puzzle);
   };
 
@@ -65,7 +87,7 @@ const MainPage: React.FC = () => {
     if (!router.isReady) return;
     if (!isConnection) return;
     if (!isReady) return;
-    getPuzzleData(router.query.id as string);
+    getPuzzleData(Number(router.query.id));
   }, [isReady, isConnection, router.isReady]);
 
   useEffect(() => {
