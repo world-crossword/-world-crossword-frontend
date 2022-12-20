@@ -23,6 +23,7 @@ const MainPage: React.FC = () => {
   const [puzzleData, setPuzzleData] = useState(null);
   const isReady = useRecoilValue(readyAtom);
   const isConnection = useRecoilValue(connectionAtom);
+  const [readyForStatus, setReadyForStatus] = useState(false);
   const router = useRouter();
 
   const openWordHandler = ({ startRow, startCol, id, isRow }: WordHandlerData) => {
@@ -80,6 +81,7 @@ const MainPage: React.FC = () => {
     }
     const processedId = id <= 0 || id >= 11 ? 1 : id;
     const res = await myAxios('get', `puzzle/0/${processedId}`, null, true);
+    setReadyForStatus(true);
     setPuzzleData(res.data.puzzle);
   };
 
@@ -111,7 +113,7 @@ const MainPage: React.FC = () => {
           {/* <div className={'exit'} onClick={goToLogin}>
             <Image alt={'exit'} src={exit} width={20} />
           </div> */}
-          <Status></Status>
+          <Status ready={readyForStatus}></Status>
           <div className="boardWrapper">
             <Board
               openWordHandler={openWordHandler}

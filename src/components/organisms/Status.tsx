@@ -8,7 +8,11 @@ import myAxios from 'others/myAxios';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { rankingListAtom, readyAtom } from 'others/store';
 
-const Status: React.FC = () => {
+interface Props {
+  ready: boolean;
+}
+
+const Status: React.FC<Props> = ({ ready }) => {
   const [isExpand, setIsExpand] = useState(true);
   const [rankingList, setRankingList] = useRecoilState<{
     ranking: [];
@@ -36,9 +40,9 @@ const Status: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!isReady) return;
+    if (!ready) return;
     getRanking();
-  }, [isReady]);
+  }, [ready]);
 
   return (
     <StyledStatus isExpand={isExpand}>
