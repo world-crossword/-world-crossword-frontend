@@ -12,7 +12,7 @@ const Checker: React.FC = () => {
 
   const checkLogin = async () => {
     try {
-      await myAxios('post', 'api/v1/auth/account-token', null, true);
+      await myAxios('get', 'member/me', null, true);
       // console.log(res);
       setIsLogin(true);
     } catch (e) {
