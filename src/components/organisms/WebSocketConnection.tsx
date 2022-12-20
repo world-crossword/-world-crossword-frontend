@@ -1,16 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
+import { connectionAtom, loginAtom, rankingListAtom, solvedWordAtom } from 'others/store';
+import { useEffect, useRef } from 'react';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
-const BROKER_URL = `ws://project.nextkhoon.xyz:58866/puzzle`;
+const BROKER_URL = `ws://project.nextkhoon.xyz:58866/puzzlesocket`;
 
 const WebSocketConnection = () => {
-  const [socketConnected, setSocketConnected] = useState(false);
+  const router = useRouter();
+  const isLogin = useRecoilValue(loginAtom);
+  const [socketConnected, setSocketConnected] = useRecoilState(connectionAtom);
+  const setRankingList = useSetRecoilState(rankingListAtom);
+  const setSolvedWord = useSetRecoilState(solvedWordAtom);
   const ws = useRef<any>(null);
 
   useEffect(() => {
+    if (!isLogin) return;
     if (!ws.current) {
       ws.current = new WebSocket(BROKER_URL);
       ws.current.onopen = () => {
-        console.log('hi');
         setSocketConnected(true);
       };
 
@@ -20,7 +27,7 @@ const WebSocketConnection = () => {
     }
 
     return () => {};
-  }, []);
+  }, [isLogin]);
 
   useEffect(() => {
     if (socketConnected) {
@@ -33,7 +40,9 @@ const WebSocketConnection = () => {
       );
 
       ws.current.onmessage = (event: any) => {
-        console.log(event.data);
+        const puzzle = JSON.parse(event.data).puzzle;
+        if (puzzle.sessionName === router.query.id) setSolvedWord(puzzle);
+        setRankingList(JSON.parse(event.data).ranking);
       };
     }
   }, [socketConnected]);

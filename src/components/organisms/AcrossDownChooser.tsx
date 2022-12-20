@@ -22,12 +22,14 @@ const AcrossDownChooser: React.FC<Props> = ({ closeAcrossDownChooser, openWordHa
       openWordHandler({
         startRow: acrossDownChooserData.row.startRow,
         startCol: acrossDownChooserData.row.startCol,
+        id: acrossDownChooserData.row.id,
         isRow: true,
       });
     } else {
       openWordHandler({
         startRow: acrossDownChooserData.col.startRow,
         startCol: acrossDownChooserData.col.startCol,
+        id: acrossDownChooserData.col.id,
         isRow: false,
       });
     }

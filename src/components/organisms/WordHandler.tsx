@@ -9,6 +9,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import back from 'public/back.png';
 import Image from 'next/image';
+import myAxios from 'others/myAxios';
 
 interface Props {
   closeWordHandler: () => void;
@@ -16,49 +17,80 @@ interface Props {
 }
 
 const WordHandler: React.FC<Props> = ({ closeWordHandler, wordHandlerData }) => {
-  const [wordState, setWordState] = useState(DEFAULT_WORD_STATE);
-  const [word, setWord] = useState('');
+  const [wordData, setWordData] = useState({});
+  const [inputWord, setInputWord] = useState('');
+  const [handlerState, setHandlerState] = useState(DEFAULT_WORD_STATE);
 
   const goToMain = () => closeWordHandler();
 
   const typeAnswer = (e: ChangeEvent<HTMLInputElement>) => {
-    setWord(e.target.value);
+    setInputWord(e.target.value);
+  };
+
+  const handleHandlerState = (completion, solver_id) => {
+    if (completion === 0) setHandlerState(DEFAULT_WORD_STATE);
+    else setHandlerState(solver_id !== 1 ? ANY_CORRECT_WORD_STATE : MY_CORRECT_WORD_STATE);
+  };
+
+  const getWordData = async () => {
+    const res = await myAxios('get', `puzzle/mean/${wordHandlerData.id}`);
+    console.log(res.data.word);
+    setWordData(res.data);
+    handleHandlerState(res.data.completion, res.data.solver_id);
+  };
+
+  const submitWord = async (e) => {
+    e.preventDefault();
+    const res = await myAxios('post', `puzzle`, {
+      id: wordHandlerData.id,
+      word: inputWord,
+      session_name: '1',
+    });
+    setHandlerState(res.data.solved === RIGHT ? MY_CORRECT_WORD_STATE : WRONG_WORD_STATE);
   };
 
   useEffect(() => {
-    // console.log(wordHandlerData);
+    getWordData();
   }, [wordHandlerData]);
 
   return (
-    <StyledWordHandler state={wordState}>
-      <div className="goBackWrapper">
-        <div className="goBack" onClick={closeWordHandler}>
-          <Image alt={'go back'} src={back} />
-        </div>
-      </div>
-      <form>
-        <input
-          type={'text'}
-          value={word}
-          onChange={(e) => typeAnswer(e)}
-          readOnly={wordState === MY_CORRECT_WORD_STATE || wordState === ANY_CORRECT_WORD_STATE}
-        />
-        <div>
-          <p>5 Letter</p>
-          <p>noun</p>
-        </div>
-        <p>the act of saying the word hello to someone as a greeting</p>
-        <div className="submit">
-          {wordState === WRONG_WORD_STATE || wordState === DEFAULT_WORD_STATE ? (
-            <button type={'submit'}>SUBMIT</button>
-          ) : (
-            <button type={'button'} onClick={goToMain}>
-              GO BACK
-            </button>
-          )}
-        </div>
-      </form>
-    </StyledWordHandler>
+    <>
+      {wordData && (
+        <StyledWordHandler state={handlerState}>
+          <div className="goBackWrapper">
+            <div className="goBack" onClick={closeWordHandler}>
+              <Image alt={'go back'} src={back} />
+            </div>
+          </div>
+          <form onSubmit={submitWord}>
+            <input
+              type={'text'}
+              value={
+                handlerState === MY_CORRECT_WORD_STATE || handlerState === ANY_CORRECT_WORD_STATE
+                  ? wordData?.word
+                  : inputWord
+              }
+              onChange={(e) => typeAnswer(e)}
+              readOnly={handlerState === MY_CORRECT_WORD_STATE || handlerState === ANY_CORRECT_WORD_STATE}
+            />
+            <div>
+              <p>{wordData?.word?.length} Letter</p>
+              <p>{wordData?.part}</p>
+            </div>
+            <p>{wordData?.mean}</p>
+            <div className="submit">
+              {handlerState === WRONG_WORD_STATE || handlerState === DEFAULT_WORD_STATE ? (
+                <button type={'submit'}>SUBMIT</button>
+              ) : (
+                <button type={'button'} onClick={goToMain}>
+                  GO BACK
+                </button>
+              )}
+            </div>
+          </form>
+        </StyledWordHandler>
+      )}
+    </>
   );
 };
 
@@ -162,5 +194,8 @@ const StyledWordHandler = styled.div<WordHandlerProps>`
     }
   }
 `;
+
+const WRONG = 'WRONG',
+  RIGHT = 'RIGHT';
 
 export default WordHandler;

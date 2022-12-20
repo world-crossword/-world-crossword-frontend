@@ -17,7 +17,7 @@ interface myAxiosOption {
   withCredentials: boolean;
 }
 
-const serverURL = '';
+const serverURL = 'http://project.nextkhoon.xyz:58866/';
 
 const myAxios: myAxiosFunc = async (
   action,

@@ -29,6 +29,7 @@ export const zIndex = {
 export interface WordHandlerData {
   startRow: number;
   startCol: number;
+  id: number;
   isRow: boolean;
 }
 
@@ -36,10 +37,12 @@ export interface AcrossDownChooserData {
   row: {
     startRow: number;
     startCol: number;
+    id: number;
   };
   col: {
     startRow: number;
     startCol: number;
+    id: number;
   };
 }
 

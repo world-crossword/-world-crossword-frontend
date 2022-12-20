@@ -1,6 +1,10 @@
+import { useRouter } from 'next/router';
 import { BLANK_STATE, PRIVATE_STATE, PUBLIC_STATE } from 'others/GlobalConsts';
 import { AcrossDownChooserData, WordHandlerData } from 'others/GlobalStyle';
+import myAxios from 'others/myAxios';
+import { connectionAtom, solvedWordAtom } from 'others/store';
 import { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
 import LetterBox from '../LetterBox';
 import { StyledBoard } from './styled';
 
@@ -11,104 +15,60 @@ interface Atom {
   length: number;
   alp: string;
   isSolved: boolean;
+  id: number;
 }
-
-const NNArray: {
-  row: Atom;
-  col: Atom;
-}[][] = Array.from(Array(50), () =>
-  JSON.parse(
-    JSON.stringify(
-      Array(50).fill({
-        row: { state: BLANK_STATE },
-        col: { state: BLANK_STATE },
-      })
-    )
-  )
-);
 
 interface Props {
   openWordHandler: (arg0: WordHandlerData) => void;
   openAcrossDownChooser: (arg0: AcrossDownChooserData) => void;
+  puzzleData: any[] | null;
 }
 
-const Board: React.FC<Props> = ({ openWordHandler, openAcrossDownChooser }) => {
-  const [loadArray, setLoadArray] = useState(false);
-
-  const quizData = [
-    {
-      startRow: 3,
-      startCol: 2,
-      isRow: true,
-      length: 7,
-      str: 'youtube',
-      isSolved: true,
-    },
-    {
-      startRow: 3,
-      startCol: 2,
-      isRow: false,
-      length: 7,
-      str: 'youtube',
-      isSolved: true,
-    },
-    {
-      startRow: 1,
-      startCol: 3,
-      isRow: false,
-      length: 5,
-      str: 'hello',
-      isSolved: false,
-    },
-    {
-      startRow: 5,
-      startCol: 5,
-      isRow: true,
-      length: 10,
-      str: 'hellohello',
-      isSolved: true,
-    },
-    {
-      startRow: 49,
-      startCol: 49,
-      isRow: true,
-      length: 1,
-      str: 'a',
-      isSolved: false,
-    },
-    {
-      startRow: 0,
-      startCol: 0,
-      isRow: true,
-      length: 1,
-      str: 'a',
-      isSolved: false,
-    },
-  ];
+const Board: React.FC<Props> = ({ openWordHandler, openAcrossDownChooser, puzzleData }) => {
+  const [NNArray, setNNArray] = useState<{ row: Atom; col: Atom }[][]>([]);
+  const solvedWord = useRecoilValue(solvedWordAtom);
 
   const processArray = () => {
-    quizData.forEach(({ startRow, startCol, isRow, length, str, isSolved }) => {
+    const newNNArray = Array.from(Array(50), () =>
+      JSON.parse(
+        JSON.stringify(
+          Array(50).fill({
+            row: { state: BLANK_STATE },
+            col: { state: BLANK_STATE },
+          })
+        )
+      )
+    );
+    puzzleData?.forEach(({ col_point: startRow, row_point: startCol, completion, direction, id, solver_id, word }) => {
+      const isSolved = completion === 0 ? false : true,
+        isRow = direction === ACROSS ? true : false,
+        length = word.length;
+
+      newNNArray[startCol][startRow].start = true;
+
       if (isRow) {
         for (let i = startRow; i < startRow + length; i++) {
-          const posRow = NNArray[startCol][i].row;
+          const posRow = newNNArray[startCol][i].row;
           posRow.state = isSolved ? PUBLIC_STATE : PRIVATE_STATE;
           posRow.startRow = startRow;
           posRow.startCol = startCol;
           posRow.length = length;
-          posRow.alp = str[i - startRow];
+          posRow.alp = word[i - startRow];
+          posRow.id = id;
         }
       } else {
         for (let i = startCol; i < startCol + length; i++) {
-          const posCol = NNArray[i][startRow].col;
+          const posCol = newNNArray[i][startRow].col;
           posCol.state = isSolved ? PUBLIC_STATE : PRIVATE_STATE;
           posCol.startRow = startRow;
           posCol.startCol = startCol;
           posCol.length = length;
-          posCol.alp = str[i - startCol];
+          posCol.alp = word[i - startCol];
+          posCol.id = id;
         }
       }
     });
-    setLoadArray(true);
+    setNNArray(newNNArray);
   };
 
   const processedState = (rowState: number, colState: number) => {
@@ -119,38 +79,68 @@ const Board: React.FC<Props> = ({ openWordHandler, openAcrossDownChooser }) => {
 
   const processedAlp = (rowAlp: string, colAlp: string) => rowAlp ?? colAlp;
 
-  const processedData = (row: Atom, col: Atom) => ({
+  const processedData = (row: Atom, col: Atom, start) => ({
     state: processedState(row.state, col.state),
-    row: row.state !== BLANK_STATE ? { startRow: row.startRow, startCol: row.startCol } : undefined,
-    col: col.state !== BLANK_STATE ? { startRow: col.startRow, startCol: col.startCol } : undefined,
+    row: row.state !== BLANK_STATE ? { startRow: row.startRow, startCol: row.startCol, id: row.id } : undefined,
+    col: col.state !== BLANK_STATE ? { startRow: col.startRow, startCol: col.startCol, id: col.id } : undefined,
     alp: processedAlp(row.alp, col.alp),
+    start: start ?? false,
   });
 
+  const updateArray = ({ row_point: startCol, col_point: startRow, direction, word }) => {
+    const isRow = direction === ACROSS ? true : false;
+    const newNNArray = JSON.parse(JSON.stringify(NNArray));
+    const length = word?.length;
+    if (isRow) {
+      for (let i = startRow; i < startRow + length; i++) {
+        const posRow = newNNArray[startCol][i].row;
+        console.log(posRow);
+        posRow.state = PUBLIC_STATE;
+      }
+    } else {
+      for (let i = startCol; i < startCol + length; i++) {
+        const posCol = newNNArray[i][startRow].col;
+        posCol.state = PUBLIC_STATE;
+      }
+    }
+    // console.log(newNNArray);
+    setNNArray(newNNArray);
+  };
+
   useEffect(() => {
+    if (!puzzleData) return;
     processArray();
-  }, []);
+  }, [puzzleData]);
+
+  useEffect(() => {
+    console.log(solvedWord);
+    updateArray(solvedWord);
+  }, [solvedWord]);
 
   return (
     <StyledBoard>
-      {NNArray.map((rows, colIdx) => {
-        return (
-          <div key={`col${colIdx}`}>
-            {loadArray &&
-              rows.map(({ row, col }, rowIdx) => {
+      {puzzleData &&
+        NNArray?.map((rows, colIdx) => {
+          return (
+            <div key={`col${colIdx}`}>
+              {rows.map(({ row, col, start }, rowIdx) => {
                 return (
                   <LetterBox
                     key={`${colIdx},${rowIdx}`}
-                    data={processedData(row, col)}
+                    data={processedData(row, col, start)}
                     openWordHandler={openWordHandler}
                     openAcrossDownChooser={openAcrossDownChooser}
                   ></LetterBox>
                 );
               })}
-          </div>
-        );
-      })}
+            </div>
+          );
+        })}
     </StyledBoard>
   );
 };
+
+const ACROSS = 'ACROSS',
+  DOWN = 'DOWN';
 
 export default Board;

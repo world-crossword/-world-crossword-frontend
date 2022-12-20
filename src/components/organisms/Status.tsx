@@ -3,10 +3,14 @@ import styled from 'styled-components';
 import crown from 'public/crown.svg';
 import left from 'public/left.svg';
 import right from 'public/right.svg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import myAxios from 'others/myAxios';
+import { useRecoilState } from 'recoil';
+import { rankingListAtom } from 'others/store';
 
 const Status: React.FC = () => {
   const [isExpand, setIsExpand] = useState(true);
+  const [rankingList, setRankingList] = useRecoilState(rankingListAtom);
 
   const handleStatusSize = () => {
     setIsExpand(!isExpand);
@@ -16,6 +20,15 @@ const Status: React.FC = () => {
     if (!isExpand) setIsExpand(true);
   };
 
+  const getRanking = async () => {
+    const res = await myAxios('get', `ranking`);
+    setRankingList(res.data);
+  };
+
+  useEffect(() => {
+    getRanking();
+  }, []);
+
   return (
     <StyledStatus isExpand={isExpand}>
       <div className={'header'} onClick={expandStatus}>
@@ -23,25 +36,19 @@ const Status: React.FC = () => {
         <p>Ranking</p>
       </div>
       <div className={'ranking'}>
-        <div>
-          <span className={'rank'}>1</span>
-          <span className={'nickname'}>hi</span>
-          <span className={'score'}>230</span>
-        </div>
-        <div>
-          <span className={'rank'}>2</span>
-          <span className={'nickname'}>hello</span>
-          <span className={'score'}>180</span>
-        </div>
-        <div>
-          <span className={'rank'}>3</span>
-          <span className={'nickname'}>me</span>
-          <span className={'score'}>150</span>
-        </div>
+        {rankingList?.ranking.map(({ rank, ranker, score }) => {
+          return (
+            <div key={ranker?.username}>
+              <span className={'rank'}>{rank}</span>
+              <span className={'nickname'}>{ranker?.username}</span>
+              <span className={'score'}>{score}</span>
+            </div>
+          );
+        })}
         <div className={'myRanking'}>
-          <span className={'rank'}>1</span>
-          <span className={'nickname'}>hi</span>
-          <span className={'score'}>230</span>
+          <span className={'rank'}>{rankingList?.mine?.rank}</span>
+          <span className={'nickname'}>{rankingList?.mine?.ranker?.username}</span>
+          <span className={'score'}>{rankingList?.mine?.score}</span>
         </div>
       </div>
       <div className={'close'} onClick={handleStatusSize}>

@@ -30,14 +30,14 @@ const Checker: React.FC = () => {
     // checkLogin();
   }, REFRESH_ACCESS_TOKEN_TIME);
 
-  useEffect(() => {
-    if (!isReady) return;
-    if (!isLogin) {
-      if (router.pathname !== '/login') router.push('/login');
-    } else {
-      if (router.pathname === '/login') router.push('/');
-    }
-  }, [isReady, router.pathname]);
+  // useEffect(() => {
+  //   if (!isReady) return;
+  //   if (!isLogin) {
+  //     if (router.pathname !== '/login') router.push('/login');
+  //   } else {
+  //     if (router.pathname === '/login') router.push('/');
+  //   }
+  // }, [isReady, router.pathname]);
 
   return <></>;
 };

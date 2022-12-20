@@ -10,18 +10,26 @@ import exit from 'public/exit.svg';
 import logo from 'public/mainLogo.png';
 import { useRouter } from 'next/router';
 import { useRecoilValue } from 'recoil';
+import { readyAtom, connectionAtom } from 'others/store';
+import arrowLeft from 'public/arrowLeft.svg';
+import arrowRight from 'public/arrowRight.svg';
+import myAxios from 'others/myAxios';
 
 const MainPage: React.FC = () => {
   const [handleWordHandler, setHandleWordHandler] = useState(false);
   const [wordHandlerData, setWordHandlerData] = useState<WordHandlerData>();
   const [handleAcrossDownChooser, setHandleAcrossDownChooser] = useState(false);
   const [acrossDownChooserData, setAcrossDownChooserData] = useState<AcrossDownChooserData>();
+  const [puzzleData, setPuzzleData] = useState(null);
+  const isReady = useRecoilValue(readyAtom);
+  const isConnection = useRecoilValue(connectionAtom);
   const router = useRouter();
 
-  const openWordHandler = ({ startRow, startCol, isRow }: WordHandlerData) => {
+  const openWordHandler = ({ startRow, startCol, id, isRow }: WordHandlerData) => {
     setWordHandlerData({
       startRow,
       startCol,
+      id,
       isRow,
     });
     setHandleWordHandler(true);
@@ -38,13 +46,40 @@ const MainPage: React.FC = () => {
     router.push('/login');
   };
 
+  const movePuzzle = async (ad: number) => {
+    const id = Number(router.query.id);
+    router.push({
+      pathname: '/',
+      query: { id: id + ad },
+    });
+    const res = await myAxios('get', `puzzle/${id}/${id + ad}`);
+    setPuzzleData(res.data.puzzle);
+  };
+
+  const getPuzzleData = async (id: number) => {
+    const res = await myAxios('get', `puzzle/0/${id}`);
+    setPuzzleData(res.data.puzzle);
+  };
+
   useEffect(() => {
-    console.log('메인페이지 입장');
-  }, []);
+    if (!router.isReady) return;
+    getPuzzleData(router.query.id);
+  }, [isConnection, router.isReady]);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (!router.query.id) {
+      router.push({
+        pathname: '/',
+        query: { id: 1 },
+      });
+      return;
+    }
+  }, [router.isReady]);
 
   return (
     <MainPageLayout>
-      {
+      {isReady && (
         <>
           <div className="logo">
             <Image alt={'mainLogo'} src={logo} fill />
@@ -54,7 +89,11 @@ const MainPage: React.FC = () => {
           </div>
           <Status></Status>
           <div className="boardWrapper">
-            <Board openWordHandler={openWordHandler} openAcrossDownChooser={openAcrossDownChooser}></Board>
+            <Board
+              openWordHandler={openWordHandler}
+              openAcrossDownChooser={openAcrossDownChooser}
+              puzzleData={puzzleData}
+            ></Board>
           </div>
           {handleWordHandler && wordHandlerData && (
             <WordHandler closeWordHandler={closeWordHandler} wordHandlerData={wordHandlerData}></WordHandler>
@@ -66,8 +105,14 @@ const MainPage: React.FC = () => {
               acrossDownChooserData={acrossDownChooserData}
             ></AcrossDownChooser>
           )}
+          <div className="move moveLeft" onClick={() => movePuzzle(-1)}>
+            <Image alt={'arrow left'} src={arrowLeft} />
+          </div>
+          <div className="move moveRight" onClick={() => movePuzzle(1)}>
+            <Image alt={'arrow right'} src={arrowRight} />
+          </div>
         </>
-      }
+      )}
     </MainPageLayout>
   );
 };
@@ -78,6 +123,29 @@ const MainPageLayout = styled(PageDefaultLayout)`
   justify-content: center;
   min-width: 2800px;
   min-height: 2800px;
+
+  .move {
+    position: fixed;
+    top: calc(50% - 15px);
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    border-radius: 50%;
+    overflow: hidden;
+    > img {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .move:hover {
+    border: solid 2px #04673a;
+  }
+  .moveLeft {
+    left: 10px;
+  }
+  .moveRight {
+    right: 10px;
+  }
 
   .logo {
     position: absolute;

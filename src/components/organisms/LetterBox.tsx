@@ -5,9 +5,10 @@ import styled from 'styled-components';
 interface Props {
   data: {
     state: number;
-    row: { startRow: number; startCol: number } | undefined;
-    col: { startRow: number; startCol: number } | undefined;
+    row: { startRow: number; startCol: number; id: number } | undefined;
+    col: { startRow: number; startCol: number; id: number } | undefined;
     alp: string;
+    start: boolean;
   };
   openWordHandler: (arg0: WordHandlerData) => void;
   openAcrossDownChooser: (arg0: AcrossDownChooserData) => void;
@@ -20,10 +21,12 @@ const LetterBox: React.FC<Props> = ({ data, openWordHandler, openAcrossDownChoos
         row: {
           startRow: data.row.startRow,
           startCol: data.row.startCol,
+          id: data.row.id,
         },
         col: {
           startRow: data.col.startRow,
           startCol: data.col.startCol,
+          id: data.col.id,
         },
       });
       return;
@@ -32,6 +35,7 @@ const LetterBox: React.FC<Props> = ({ data, openWordHandler, openAcrossDownChoos
       openWordHandler({
         startRow: data.row.startRow,
         startCol: data.row.startCol,
+        id: data.row.id,
         isRow: true,
       });
     }
@@ -39,6 +43,7 @@ const LetterBox: React.FC<Props> = ({ data, openWordHandler, openAcrossDownChoos
       openWordHandler({
         startRow: data.col.startRow,
         startCol: data.col.startCol,
+        id: data.col.id,
         isRow: false,
       });
     }
@@ -48,10 +53,12 @@ const LetterBox: React.FC<Props> = ({ data, openWordHandler, openAcrossDownChoos
     case BLANK_STATE:
       return <Blank></Blank>;
     case PRIVATE_STATE:
-      return <StyledLetterBox state={PRIVATE_STATE} onClick={letterBoxClickHandler}></StyledLetterBox>;
+      return (
+        <StyledLetterBox state={PRIVATE_STATE} start={data.start} onClick={letterBoxClickHandler}></StyledLetterBox>
+      );
     case PUBLIC_STATE:
       return (
-        <StyledLetterBox state={PUBLIC_STATE} onClick={letterBoxClickHandler}>
+        <StyledLetterBox state={PUBLIC_STATE} start={data.start} onClick={letterBoxClickHandler}>
           {data.alp}
         </StyledLetterBox>
       );
@@ -70,6 +77,7 @@ const Blank = styled.div`
 
 interface StyledLetterBoxProps {
   state: number;
+  start: boolean;
 }
 
 const StyledLetterBox = styled.div<StyledLetterBoxProps>`
@@ -94,6 +102,9 @@ const StyledLetterBox = styled.div<StyledLetterBoxProps>`
       box-shadow: 0 0 0 1px #04673a;
       `;
     }
+  }}
+  ${({ start }) => {
+    if (start) return `box-shadow: 0 0 4px 1px #04673a;`;
   }}
   cursor: pointer;
   font-size: 22px;
